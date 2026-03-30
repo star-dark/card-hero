@@ -13,6 +13,12 @@ config_version=5
 config/name="CardHero"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+run/main_scene="res://scenes/dungeon/test_room.tscn"
+
+[autoload]
+
+GameManager="*res://scripts/managers/GameManager.gd"
+CardManager="*res://scripts/managers/CardManager.gd"
 
 [physics]
 
