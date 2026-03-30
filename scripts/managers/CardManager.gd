@@ -1,4 +1,3 @@
-class_name CardManager
 extends Node
 
 signal hand_changed

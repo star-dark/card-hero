@@ -1,4 +1,3 @@
-class_name GameManager
 extends Node
 
 enum GameState { PLAYING, PAUSED, GAME_OVER }
@@ -32,6 +31,18 @@ func _setup_input_actions() -> void:
 		var e := InputEventKey.new()
 		e.physical_keycode = KEY_SPACE
 		InputMap.action_add_event("dash", e)
+
+	# WASD를 기본 ui_* 방향키에 추가
+	var wasd := {
+		"ui_left":  KEY_A,
+		"ui_right": KEY_D,
+		"ui_up":    KEY_W,
+		"ui_down":  KEY_S,
+	}
+	for action: String in wasd:
+		var key_event := InputEventKey.new()
+		key_event.physical_keycode = wasd[action]
+		InputMap.action_add_event(action, key_event)
 
 func set_state(new_state: GameState) -> void:
 	if current_state == new_state:

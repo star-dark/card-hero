@@ -24,9 +24,9 @@ func _ready() -> void:
 	_spawn_enemy(Vector2(750, 350), CardData.Element.GRASS,    50)
 	_spawn_enemy(Vector2(650, 480), CardData.Element.ELECTRIC, 50)
 
-	# 카드 매니저 시그널 연결
-	CardManager.hand_changed.connect(_update_hand_ui)
-	CardManager.cost_changed.connect(_update_cost_ui)
+	# 카드 매니저 시그널 연결 (DEFERRED: 버튼 클릭 콜백 완료 후 UI 갱신)
+	CardManager.hand_changed.connect(_update_hand_ui, CONNECT_DEFERRED)
+	CardManager.cost_changed.connect(_update_cost_ui, CONNECT_DEFERRED)
 
 	# GameManager 게임오버 연결
 	GameManager.game_state_changed.connect(_on_game_state_changed)
@@ -79,7 +79,7 @@ func _on_card_pressed(card: CardData) -> void:
 	if player and GameManager.current_state == GameManager.GameState.PLAYING:
 		player.use_card_from_hand(card)
 
-func _on_game_state_changed(new_state: GameManager.GameState) -> void:
+func _on_game_state_changed(new_state: int) -> void:
 	if new_state == GameManager.GameState.GAME_OVER:
 		game_over_label.visible = true
 		for btn in hand_buttons:
