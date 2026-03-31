@@ -11,32 +11,60 @@ const ATTACK_DAMAGE    := 15
 const CHARGE_DAMAGE    := 40
 const ATTACK_STUN_TIME := 0.25
 
+const SPRITE_BASE := "res://assets/Tiny RPG Character Asset Pack v1.02 -Free Soldier&Orc/Soldier/Soldier with shadows/"
+
 # ── 상태 ─────────────────────────────────────────────────────────
-var is_dashing       := false
-var is_invincible    := false
-var dash_direction   := Vector2.RIGHT
-var dash_timer       := 0.0
-var dash_cd_timer    := 0.0
-var is_attacking     := false
+var is_dashing        := false
+var is_invincible     := false
+var dash_direction    := Vector2.RIGHT
+var dash_timer        := 0.0
+var dash_cd_timer     := 0.0
+var is_attacking      := false
 var attack_stun_timer := 0.0
-var is_charging      := false
-var charge_timer     := 0.0
-var face_dir         := Vector2.RIGHT
+var is_charging       := false
+var charge_timer      := 0.0
+var face_dir          := Vector2.RIGHT
 
 # ── 노드 참조 ────────────────────────────────────────────────────
-@onready var sprite: Sprite2D       = $Sprite2D
-@onready var attack_area: Area2D    = $AttackArea
-@onready var health: HealthComponent = $HealthComponent
+@onready var anim_sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var attack_area: Area2D           = $AttackArea
+@onready var health: HealthComponent       = $HealthComponent
 
 func _ready() -> void:
 	add_to_group("player")
 	health.died.connect(_on_died)
-	_make_placeholder_sprite(Color(0.95, 0.45, 0.1))  # 불 → 주황
+	_setup_animations()
+	anim_sprite.play("idle")
 
-func _make_placeholder_sprite(color: Color) -> void:
-	var img := Image.create(32, 32, false, Image.FORMAT_RGBA8)
-	img.fill(color)
-	sprite.texture = ImageTexture.create_from_image(img)
+func _setup_animations() -> void:
+	var frames := SpriteFrames.new()
+	frames.remove_animation("default")
+
+	# 애니메이션명: {파일명, 프레임 수, FPS, 루프 여부}
+	var anim_data := {
+		"idle":    {"file": "Soldier-Idle.png",     "count": 6, "fps": 8.0,  "loop": true},
+		"walk":    {"file": "Soldier-Walk.png",     "count": 8, "fps": 10.0, "loop": true},
+		"attack":  {"file": "Soldier-Attack01.png", "count": 6, "fps": 14.0, "loop": false},
+		"attack2": {"file": "Soldier-Attack02.png", "count": 6, "fps": 14.0, "loop": false},
+		"charge":  {"file": "Soldier-Attack03.png", "count": 9, "fps": 10.0, "loop": false},
+		"death":   {"file": "Soldier-Death.png",    "count": 4, "fps": 8.0,  "loop": false},
+		"hurt":    {"file": "Soldier-Hurt.png",     "count": 4, "fps": 12.0, "loop": false},
+	}
+
+	for anim_name in anim_data:
+		var data: Dictionary = anim_data[anim_name]
+		frames.add_animation(anim_name)
+		frames.set_animation_speed(anim_name, data["fps"])
+		frames.set_animation_loop(anim_name, data["loop"])
+
+		var texture: Texture2D = load(SPRITE_BASE + data["file"])
+		for i in data["count"]:
+			var atlas := AtlasTexture.new()
+			atlas.atlas  = texture
+			atlas.region = Rect2(i * 100, 0, 100, 100)
+			frames.add_frame(anim_name, atlas)
+
+	anim_sprite.sprite_frames = frames
 
 # ── 메인 루프 ────────────────────────────────────────────────────
 func _physics_process(delta: float) -> void:
@@ -45,6 +73,7 @@ func _physics_process(delta: float) -> void:
 	if is_dashing:
 		velocity = dash_direction * DASH_SPEED
 		move_and_slide()
+		_update_animation()
 		return
 
 	if not is_attacking:
@@ -54,13 +83,34 @@ func _physics_process(delta: float) -> void:
 
 	_handle_combat(delta)
 	move_and_slide()
+	_update_animation()
+
+func _update_animation() -> void:
+	if is_dashing:
+		anim_sprite.speed_scale = 2.0
+		if anim_sprite.animation != "walk":
+			anim_sprite.play("walk")
+		return
+
+	anim_sprite.speed_scale = 1.0
+
+	# 공격/차지 중에는 해당 애니메이션이 스스로 끝날 때까지 유지
+	if is_attacking:
+		return
+
+	if velocity.length() > 10.0:
+		if anim_sprite.animation != "walk":
+			anim_sprite.play("walk")
+	else:
+		if anim_sprite.animation != "idle":
+			anim_sprite.play("idle")
 
 func _tick_timers(delta: float) -> void:
 	# 대쉬
 	if dash_timer > 0.0:
 		dash_timer -= delta
 		if dash_timer <= 0.0:
-			is_dashing  = false
+			is_dashing    = false
 			is_invincible = false
 	if dash_cd_timer > 0.0:
 		dash_cd_timer -= delta
@@ -80,7 +130,7 @@ func _handle_movement() -> void:
 		dir = dir.normalized()
 		face_dir = dir
 		if dir.x != 0.0:
-			sprite.flip_h = dir.x < 0.0
+			anim_sprite.flip_h = dir.x < 0.0
 	velocity = dir * MOVE_SPEED
 
 func _handle_combat(delta: float) -> void:
@@ -94,13 +144,13 @@ func _handle_combat(delta: float) -> void:
 		is_charging   = true
 		charge_timer += delta
 		var t := minf(charge_timer / CHARGE_HOLD_TIME, 1.0)
-		sprite.modulate = Color(1.0 + t, 1.0 - t * 0.5, 0.3)
+		anim_sprite.modulate = Color(1.0 + t, 1.0 - t * 0.5, 0.3)
 	elif Input.is_action_just_released("special_attack"):
 		if is_charging and charge_timer >= CHARGE_HOLD_TIME:
 			_charge_attack()
-		is_charging  = false
-		charge_timer = 0.0
-		sprite.modulate = Color.WHITE
+		is_charging   = false
+		charge_timer  = 0.0
+		anim_sprite.modulate = Color.WHITE
 
 	# 대쉬 (Space)
 	if Input.is_action_just_pressed("dash") and dash_cd_timer <= 0.0:
@@ -111,8 +161,9 @@ func _basic_attack() -> void:
 	is_attacking      = true
 	attack_stun_timer = ATTACK_STUN_TIME
 
-	sprite.modulate = Color(1.8, 1.2, 0.5)
-	create_tween().tween_property(sprite, "modulate", Color.WHITE, 0.2)
+	anim_sprite.play("attack")
+	if not anim_sprite.animation_finished.is_connected(_on_attack_anim_finished):
+		anim_sprite.animation_finished.connect(_on_attack_anim_finished, CONNECT_ONE_SHOT)
 
 	for body in attack_area.get_overlapping_bodies():
 		if body.is_in_group("enemy"):
@@ -122,12 +173,17 @@ func _basic_attack() -> void:
 
 	CardManager.add_cost(1)
 
+func _on_attack_anim_finished() -> void:
+	if not is_attacking:
+		anim_sprite.play("idle")
+
 func _charge_attack() -> void:
 	is_attacking      = true
 	attack_stun_timer = 0.5
 
-	sprite.modulate = Color(2.5, 1.0, 0.2)
-	create_tween().tween_property(sprite, "modulate", Color.WHITE, 0.35)
+	anim_sprite.play("charge")
+	if not anim_sprite.animation_finished.is_connected(_on_charge_anim_finished):
+		anim_sprite.animation_finished.connect(_on_charge_anim_finished, CONNECT_ONE_SHOT)
 
 	for body in attack_area.get_overlapping_bodies():
 		if body.is_in_group("enemy"):
@@ -136,6 +192,10 @@ func _charge_attack() -> void:
 				hp.take_damage(CHARGE_DAMAGE)
 
 	CardManager.draw_card()
+
+func _on_charge_anim_finished() -> void:
+	if not is_attacking:
+		anim_sprite.play("idle")
 
 func _start_dash() -> void:
 	var dir := velocity.normalized()
@@ -147,8 +207,8 @@ func _start_dash() -> void:
 	dash_timer     = DASH_DURATION
 	dash_cd_timer  = DASH_COOLDOWN
 
-	sprite.modulate = Color(0.4, 0.7, 2.0, 0.6)
-	create_tween().tween_property(sprite, "modulate", Color.WHITE, DASH_DURATION + 0.1)
+	anim_sprite.modulate = Color(0.4, 0.7, 2.0, 0.6)
+	create_tween().tween_property(anim_sprite, "modulate", Color.WHITE, DASH_DURATION + 0.1)
 
 # ── 카드 사용 (test_room에서 호출) ─────────────────────────────
 func use_card_from_hand(card: CardData) -> void:
@@ -162,15 +222,17 @@ func use_card_from_hand(card: CardData) -> void:
 					var hp: HealthComponent = body.get_node_or_null("HealthComponent")
 					if hp:
 						hp.take_damage(int(card.damage))
-			sprite.modulate = Color(2.0, 0.8, 0.3)
-			create_tween().tween_property(sprite, "modulate", Color.WHITE, 0.3)
+			anim_sprite.play("attack2")
+			anim_sprite.animation_finished.connect(
+				func(): anim_sprite.play("idle"), CONNECT_ONE_SHOT
+			)
 
 		CardData.EffectType.HEAL:
 			health.heal(int(card.damage))
-			sprite.modulate = Color(0.4, 2.0, 0.4)
-			create_tween().tween_property(sprite, "modulate", Color.WHITE, 0.3)
+			anim_sprite.modulate = Color(0.4, 2.0, 0.4)
+			create_tween().tween_property(anim_sprite, "modulate", Color.WHITE, 0.3)
 
 func _on_died() -> void:
 	set_physics_process(false)
-	sprite.modulate = Color(0.3, 0.3, 0.3, 0.6)
+	anim_sprite.play("death")
 	GameManager.game_over()
