@@ -25,10 +25,17 @@ var is_charging       := false
 var charge_timer      := 0.0
 var face_dir          := Vector2.RIGHT
 
+# GUI가 입력을 소비했을 때 게임 입력이 무시되도록 _unhandled_input 사용
+var _attack_requested := false
+
 # ── 노드 참조 ────────────────────────────────────────────────────
 @onready var anim_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var attack_area: Area2D           = $AttackArea
 @onready var health: HealthComponent       = $HealthComponent
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("attack"):
+		_attack_requested = true
 
 func _ready() -> void:
 	add_to_group("player")
@@ -76,6 +83,8 @@ func _physics_process(delta: float) -> void:
 		_update_animation()
 		return
 
+	_update_facing()
+
 	if not is_attacking:
 		_handle_movement()
 	else:
@@ -121,6 +130,17 @@ func _tick_timers(delta: float) -> void:
 		if attack_stun_timer <= 0.0:
 			is_attacking = false
 
+func _get_mouse_dir() -> Vector2:
+	var mouse_world := get_global_mouse_position()
+	var dir := (mouse_world - global_position).normalized()
+	return dir if dir != Vector2.ZERO else Vector2.RIGHT
+
+func _update_facing() -> void:
+	var dir := _get_mouse_dir()
+	face_dir = dir
+	anim_sprite.flip_h = dir.x < 0.0
+	attack_area.rotation = dir.angle()
+
 func _handle_movement() -> void:
 	var dir := Vector2(
 		Input.get_axis("ui_left", "ui_right"),
@@ -128,14 +148,12 @@ func _handle_movement() -> void:
 	)
 	if dir != Vector2.ZERO:
 		dir = dir.normalized()
-		face_dir = dir
-		if dir.x != 0.0:
-			anim_sprite.flip_h = dir.x < 0.0
 	velocity = dir * MOVE_SPEED
 
 func _handle_combat(delta: float) -> void:
-	# 기본공격 (Z)
-	if Input.is_action_just_pressed("attack"):
+	# 기본공격 (Z) — _unhandled_input 플래그 사용 (카드 클릭 시 발동 방지)
+	if _attack_requested:
+		_attack_requested = false
 		_basic_attack()
 		return
 
@@ -165,13 +183,16 @@ func _basic_attack() -> void:
 	if not anim_sprite.animation_finished.is_connected(_on_attack_anim_finished):
 		anim_sprite.animation_finished.connect(_on_attack_anim_finished, CONNECT_ONE_SHOT)
 
+	var hit := false
 	for body in attack_area.get_overlapping_bodies():
 		if body.is_in_group("enemy"):
 			var hp: HealthComponent = body.get_node_or_null("HealthComponent")
 			if hp:
 				hp.take_damage(ATTACK_DAMAGE)
+				hit = true
 
-	CardManager.add_cost(1)
+	if hit:
+		CardManager.add_cost(1)
 
 func _on_attack_anim_finished() -> void:
 	if not is_attacking:
@@ -185,13 +206,16 @@ func _charge_attack() -> void:
 	if not anim_sprite.animation_finished.is_connected(_on_charge_anim_finished):
 		anim_sprite.animation_finished.connect(_on_charge_anim_finished, CONNECT_ONE_SHOT)
 
+	var hit := false
 	for body in attack_area.get_overlapping_bodies():
 		if body.is_in_group("enemy"):
 			var hp: HealthComponent = body.get_node_or_null("HealthComponent")
 			if hp:
 				hp.take_damage(CHARGE_DAMAGE)
+				hit = true
 
-	CardManager.draw_card()
+	if hit:
+		CardManager.draw_card()
 
 func _on_charge_anim_finished() -> void:
 	if not is_attacking:

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CardData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/CardData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+card_name = "베기"
+card_type = 2
+rarity = 0
+cost = 1
+element = 1
+effect_type = 0
+description = "적을 베어 20 데미지를 입힌다."
+damage = 20.0
+duration = 0.0

@@ -1,0 +1,123 @@
+[gd_scene format=3 uid="uid://cgg4ubc3mfdm1"]
+
+[ext_resource type="Script" uid="uid://w2qhpbmd6pid" path="res://scripts/cards/CardDisplay.gd" id="1"]
+[ext_resource type="FontFile" uid="uid://qig8qyfxstvj" path="res://assets/fonts/NotoSerifKR-ExtraBold.ttf" id="2_fpo35"]
+[ext_resource type="FontFile" uid="uid://brpb41aq1hi3y" path="res://assets/audio/NotoSerifKR-Medium.ttf" id="2_vakeg"]
+
+[node name="Card" type="Control" unique_id=898520483]
+custom_minimum_size = Vector2(100, 140)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1")
+
+[node name="Background" type="TextureRect" parent="." unique_id=3487284]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardFrame" type="TextureRect" parent="." unique_id=400592151]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CardNameLabel" type="Label" parent="CardFrame" unique_id=1138577019]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.02
+anchor_right = 0.9
+anchor_bottom = 0.17
+offset_left = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_fpo35")
+theme_override_font_sizes/font_size = 14
+vertical_alignment = 1
+
+[node name="IllustrationFrame" type="TextureRect" parent="." unique_id=382174464]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Illustration" type="TextureRect" parent="." unique_id=472159731]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.19
+anchor_right = 0.9
+anchor_bottom = 0.63
+grow_horizontal = 2
+grow_vertical = 2
+stretch_mode = 5
+
+[node name="DescriptionBG" type="TextureRect" parent="." unique_id=539812399]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DescriptionLabel" type="Label" parent="DescriptionBG" unique_id=1933573411]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.09
+anchor_top = 0.65
+anchor_right = 0.91
+anchor_bottom = 0.9
+offset_top = 30.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("2_vakeg")
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="CostIcon" type="TextureRect" parent="." unique_id=585389548]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CostLabel" type="Label" parent="CostIcon" unique_id=1939085720]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.02
+anchor_top = 0.02
+anchor_right = 0.2
+anchor_bottom = 0.2
+offset_left = 9.0
+offset_top = -0.70000005
+offset_right = 6.0
+offset_bottom = -2.8999996
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0.6509804, 1)
+theme_override_colors/font_shadow_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_fonts/font = ExtResource("2_fpo35")
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -2,11 +2,60 @@
 
 [ext_resource type="Script" uid="uid://inuhg04mel7a" path="res://scripts/player/Warrior.gd" id="1"]
 [ext_resource type="Script" uid="uid://1jv5nxhlrl8g" path="res://scripts/components/HealthComponent.gd" id="2"]
+[ext_resource type="Texture2D" uid="uid://dwbuln3t6y66g" path="res://assets/Tiny RPG Character Asset Pack v1.02 -Free Soldier&Orc/Soldier/Soldier with shadows/Soldier-Idle.png" id="2_m61b5"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gt6pi"]
+atlas = ExtResource("2_m61b5")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4xl8h"]
+atlas = ExtResource("2_m61b5")
+region = Rect2(100, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m6sio"]
+atlas = ExtResource("2_m61b5")
+region = Rect2(200, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ps5kw"]
+atlas = ExtResource("2_m61b5")
+region = Rect2(300, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eccbq"]
+atlas = ExtResource("2_m61b5")
+region = Rect2(400, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oioc4"]
+atlas = ExtResource("2_m61b5")
+region = Rect2(500, 0, 100, 100)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_insqt"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gt6pi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4xl8h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m6sio")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ps5kw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eccbq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oioc4")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
 
 [sub_resource type="RectangleShape2D" id="3"]
-size = Vector2(28, 28)
+size = Vector2(70, 70)
 
 [sub_resource type="RectangleShape2D" id="4"]
 size = Vector2(72, 72)

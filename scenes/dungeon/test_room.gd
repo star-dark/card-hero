@@ -2,9 +2,10 @@ extends Node2D
 
 const WARRIOR_SCENE := preload("res://scenes/player/warrior.tscn")
 const ENEMY_SCENE   := preload("res://scenes/enemies/base_enemy.tscn")
+const CARD_SCENE    := preload("res://scenes/ui/card/card.tscn")
 
 var player: Warrior
-var hand_buttons: Array[Button] = []
+var hand_cards: Array[CardDisplay] = []
 
 @onready var hp_label:    Label        = $HUD/TopBar/HPLabel
 @onready var cost_label:  Label        = $HUD/TopBar/CostLabel
@@ -54,19 +55,18 @@ func _update_cost_ui(current_cost: int) -> void:
 	cost_label.text = "코스트  " + s.strip_edges()
 
 func _update_hand_ui() -> void:
-	for btn in hand_buttons:
-		if is_instance_valid(btn):
-			btn.free()
-	hand_buttons.clear()
+	for c in hand_cards:
+		if is_instance_valid(c):
+			c.free()
+	hand_cards.clear()
 
 	for card in CardManager.hand:
-		var btn := Button.new()
-		btn.text         = "[%d코] %s" % [card.cost, card.card_name]
-		btn.tooltip_text = card.description
-		btn.custom_minimum_size = Vector2(130, 70)
-		btn.pressed.connect(_on_card_pressed.bind(card))
-		card_hand.add_child(btn)
-		hand_buttons.append(btn)
+		var card_display: CardDisplay = CARD_SCENE.instantiate()
+		card_hand.add_child(card_display)
+		card_display.setup(card)
+		card_display.card_played.connect(_on_card_pressed)
+		card_display.drag_started.connect(_on_card_drag_started.bind(card_display))
+		hand_cards.append(card_display)
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(deck_label):
@@ -75,6 +75,11 @@ func _process(_delta: float) -> void:
 			CardManager.discard_pile.size()
 		]
 
+func _on_card_drag_started(dragged: CardDisplay) -> void:
+	for c in hand_cards:
+		if is_instance_valid(c) and c != dragged:
+			c.reset_hover()
+
 func _on_card_pressed(card: CardData) -> void:
 	if player and GameManager.current_state == GameManager.GameState.PLAYING:
 		player.use_card_from_hand(card)
@@ -82,6 +87,6 @@ func _on_card_pressed(card: CardData) -> void:
 func _on_game_state_changed(new_state: int) -> void:
 	if new_state == GameManager.GameState.GAME_OVER:
 		game_over_label.visible = true
-		for btn in hand_buttons:
-			if is_instance_valid(btn):
-				btn.disabled = true
+		for c in hand_cards:
+			if is_instance_valid(c):
+				c.mouse_filter = Control.MOUSE_FILTER_IGNORE

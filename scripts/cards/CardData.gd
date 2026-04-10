@@ -15,3 +15,4 @@ enum EffectType { ATTACK, BUFF, DEBUFF, TERRAIN, AUGMENT, DRAW, SPECIAL, HEAL }
 @export var description: String = ""
 @export var damage: float = 0.0
 @export var duration: float = 0.0
+@export var illustration: Texture2D = null
