@@ -3,6 +3,7 @@ extends Control
 
 signal card_played(card: CardData)
 signal drag_started
+signal drag_ended
 
 @export var card_data: CardData:
 	set(value):
@@ -144,6 +145,7 @@ func _start_drag() -> void:
 	reparent(_get_canvas_layer(), true)
 	_drag_start_global = global_position  # snap-back용 카드 위치
 
+	rotation     = 0.0
 	pivot_offset = size * 0.5
 	scale        = Vector2(1.08, 1.08)
 	z_index      = 100
@@ -161,7 +163,9 @@ func _end_drag() -> void:
 		else:
 			scale   = Vector2.ONE
 			z_index = 0
+			hide()
 			card_played.emit(card_data)
+			queue_free()
 		return
 
 	_snap_back(false)
@@ -180,6 +184,8 @@ func _snap_back(flash_red: bool) -> void:
 
 	var tw := create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_ELASTIC)
 	tw.tween_property(self, "scale", Vector2.ONE, 0.45).from(Vector2(1.08, 1.08))
+
+	drag_ended.emit()
 
 func _show_cost_msg() -> void:
 	var label := Label.new()

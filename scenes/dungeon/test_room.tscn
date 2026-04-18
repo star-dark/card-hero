@@ -9,66 +9,7 @@ script = ExtResource("1")
 offset_top = 3.0
 offset_right = 1152.0
 offset_bottom = 651.0
+mouse_filter = 2
 color = Color(0.12, 0.12, 0.18, 1)
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=226683471]
-
-[node name="TopBar" type="HBoxContainer" parent="HUD" unique_id=2100542419]
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 900.0
-offset_bottom = 48.0
-theme_override_constants/separation = 30
-
-[node name="HPLabel" type="Label" parent="HUD/TopBar" unique_id=1544371312]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "HP  100 / 100"
-
-[node name="CostLabel" type="Label" parent="HUD/TopBar" unique_id=2030716530]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "코스트  ◇ ◇ ◇ ◇ ◇"
-
-[node name="DeckLabel" type="Label" parent="HUD/TopBar" unique_id=1120820241]
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "덱 15  |  버림 0"
-
-[node name="Instructions" type="Label" parent="HUD" unique_id=1668603251]
-modulate = Color(0.8, 0.8, 0.8, 1)
-offset_left = 10.0
-offset_top = 55.0
-offset_right = 600.0
-offset_bottom = 90.0
-theme_override_font_sizes/font_size = 13
-text = "WASD: 이동  |  Z: 기본공격(+코스트)  |  X홀드: 차지공격(카드드로우)  |  Space: 대쉬(무적)"
-
-[node name="CardHand" type="HBoxContainer" parent="HUD" unique_id=619624283]
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 92.0
-offset_top = -155.0
-offset_right = 1084.0
-offset_bottom = -5.0
-grow_vertical = 0
-theme_override_constants/separation = 8
-alignment = 1
-
-[node name="GameOverLabel" type="Label" parent="HUD" unique_id=339022178]
-visible = false
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -40.0
-offset_right = 200.0
-offset_bottom = 40.0
-theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
-theme_override_font_sizes/font_size = 52
-text = "GAME OVER"
-horizontal_alignment = 1
-vertical_alignment = 1

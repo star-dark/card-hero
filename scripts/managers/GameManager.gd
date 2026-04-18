@@ -32,6 +32,26 @@ func _setup_input_actions() -> void:
 		e.physical_keycode = KEY_SPACE
 		InputMap.action_add_event("dash", e)
 
+	# R : 손패 펼치기 토글
+	if not InputMap.has_action("toggle_hand"):
+		InputMap.add_action("toggle_hand")
+		var e := InputEventKey.new()
+		e.physical_keycode = KEY_R
+		InputMap.action_add_event("toggle_hand", e)
+
+	# Tab : 덱 열람
+	if not InputMap.has_action("show_deck"):
+		InputMap.add_action("show_deck")
+		var e := InputEventKey.new()
+		e.physical_keycode = KEY_TAB
+		InputMap.action_add_event("show_deck", e)
+
+	# Tab이 UI 포커스 이동에 사용되지 않도록 제거
+	if InputMap.has_action("ui_focus_next"):
+		InputMap.action_erase_events("ui_focus_next")
+	if InputMap.has_action("ui_focus_prev"):
+		InputMap.action_erase_events("ui_focus_prev")
+
 	# WASD를 기본 ui_* 방향키에 추가
 	var wasd := {
 		"ui_left":  KEY_A,
